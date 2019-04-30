@@ -25,8 +25,8 @@ import { AlertService } from './modules/alert/alert.service';
     ReactiveFormsModule,
     HttpModule,
     AlertModule,
-    // UsersModule must be before AppRoutingModule, 
-    // otherwise userroutes are overwritten by '**'. 
+    // UsersModule must be before AppRoutingModule,
+    // otherwise userroutes are overwritten by '**'.
     UsersModule,
     AppRoutingModule,
     NgbModule

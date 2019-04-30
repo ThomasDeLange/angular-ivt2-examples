@@ -16,7 +16,9 @@ export class AuthService {
   private isAdminUser = new BehaviorSubject<boolean>(false);
   private isPlainUser = new BehaviorSubject<boolean>(false);
   // Username for printing in navbar
-  private loggedInUserName = new BehaviorSubject<string>('');
+  private loggedInEmail = new BehaviorSubject<string>('');
+  private loggedInFullName = new BehaviorSubject<string>('');
+
   private readonly currentUser = 'currentuser';
   private readonly currentToken = 'token';
 
@@ -26,10 +28,10 @@ export class AuthService {
   private readonly headers = new Headers({ 'Content-Type': 'application/json' });
 
   /**
-   * 
-   * @param alertService 
-   * @param router 
-   * @param http 
+   *
+   * @param alertService
+   * @param router
+   * @param http
    */
   constructor(
     private alertService: AlertService,
@@ -40,7 +42,9 @@ export class AuthService {
       next: (user: User) => {
         console.log(`${user.email} logged in`);
         this.isLoggedInUser.next(true);
-        this.loggedInUserName.next(user.fullName);
+        this.loggedInEmail.next(user.email);
+        this.loggedInFullName.next(user.firstName + ' ' + user.lastName);
+
         // Verify the possible roles the user can have.
         // Add more verifications when nessecary.
         user.hasRole(UserRole.Admin).subscribe(result => this.isAdminUser.next(result));
@@ -57,27 +61,27 @@ export class AuthService {
 
   /**
    * Log in
-   * 
-   * @param username 
-   * @param password 
+   *
+   * @param username
+   * @param password
    */
   login(email: string, password: string) {
     console.log('login');
-    console.log(`${environment.apiUrl}/api/login`)
+    console.log(`${environment.apiUrl}/login`)
 
-    return this.http.post(`${environment.apiUrl}/api/login`, { email: email, password: password }, { headers: this.headers })
+    return this.http.post(`${environment.apiUrl}/login`, { email: email, password: password }, { headers: this.headers })
       .pipe(
         map(response => response.json()),
         tap(console.log)
       ).subscribe({
         next: response => {
-          const currentUser = new User(response);
+          const currentUser = new User({firstName: response.firstName, lastName: response.lastName, email: email});
           console.dir(currentUser);
           this.saveCurrentUser(currentUser, response.token);
-          
+
           // Notify all listeners that we're logged in.
           this.isLoggedInUser.next(true);
-          this.loggedInUserName.next(currentUser.fullName);
+          this.loggedInEmail.next(currentUser.email);
           currentUser.hasRole(UserRole.Admin).subscribe(result => this.isAdminUser.next(result));
           currentUser.hasRole(UserRole.Basic).subscribe(result => this.isPlainUser.next(result));
 
@@ -88,8 +92,42 @@ export class AuthService {
           // return true;
         },
         error: err => {
-          // console.error('Error logging in: ' + err);
-          this.alertService.error('Invalid credentials')
+          console.error('Error logging in: ' + err);
+          this.alertService.error('Invalid credentials');
+        }
+      });
+  }
+
+  register(email: string, password: string, firstName: String, lastName: String) {
+    console.log('register');
+    console.log(`${environment.apiUrl}/register`);
+
+    return this.http.post(`${environment.apiUrl}/register`, { email: email, password: password, firstName: firstName, lastName: lastName },
+    { headers: this.headers })
+      .pipe(
+        map(response => response.json()),
+        tap(console.log)
+      ).subscribe({
+        next: response => {
+          const currentUser = new User({firstName: response.firstName, lastName: response.lastName, email: email});
+          console.dir(currentUser);
+          this.saveCurrentUser(currentUser, response.token);
+
+          // Notify all listeners that we're logged in.
+          this.isLoggedInUser.next(true);
+          this.loggedInEmail.next(currentUser.email);
+          currentUser.hasRole(UserRole.Admin).subscribe(result => this.isAdminUser.next(result));
+          currentUser.hasRole(UserRole.Basic).subscribe(result => this.isPlainUser.next(result));
+
+          this.alertService.success('U bent geregistreerd en ingelogd');
+          //
+          // If redirectUrl exists, go there
+          // this.router.navigate([this.redirectUrl]);
+          // return true;
+        },
+        error: err => {
+          console.error('Error logging in: ' + err);
+          this.alertService.error('Error logging in: ' + err);
         }
       });
   }
@@ -112,7 +150,7 @@ export class AuthService {
   private getCurrentUser(): Observable<User> {
     return Observable.create(observer => {
       const localUser: any = JSON.parse(localStorage.getItem(this.currentUser));
-      if(localUser) {
+      if (localUser) {
         console.log('localUser found');
         observer.next(new User(localUser));
         observer.complete();
@@ -120,12 +158,12 @@ export class AuthService {
         console.log('NO localUser found');
         observer.error('NO localUser found');
         observer.complete();
-      };
+      }
     });
   }
 
   /**
-   * 
+   *
    */
   private saveCurrentUser(user: User, token: string): void {
     localStorage.setItem(this.currentUser, JSON.stringify(user));
@@ -133,20 +171,20 @@ export class AuthService {
   }
 
   get userFullName(): Observable<string> {
-    console.log('userFullName ' + this.loggedInUserName.value);
-    return this.loggedInUserName.asObservable();
+    console.log('user Full Name ' + this.loggedInFullName.value);
+    return this.loggedInFullName.asObservable();
   }
 
   /**
-   * 
+   *
    */
   get userIsLoggedIn(): Observable<boolean> {
     console.log('userIsLoggedIn() ' + this.isLoggedInUser.value);
     return this.isLoggedInUser.asObservable();
   }
-  
+
   /**
-   * 
+   *
    */
   get userIsAdmin(): Observable<boolean> {
     console.log('userIsAdmin() ' + this.isAdminUser.value);
@@ -154,7 +192,7 @@ export class AuthService {
   }
 
   /**
-   * 
+   *
    */
   get userIsPlain(): Observable<boolean> {
     console.log('userIsPlain() ' + this.isPlainUser.value);

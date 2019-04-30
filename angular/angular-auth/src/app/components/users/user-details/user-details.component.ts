@@ -14,14 +14,14 @@ export class UserDetailsComponent implements OnInit {
   title = 'User Detail';
   user: User;
   id: number;
-  
+
   constructor(
     private route: ActivatedRoute,
     private userService: UserService
   ) { }
 
   ngOnInit() {
-    // Subscribe to changes in route params. 
+    // Subscribe to changes in route params.
     // When the route changes we get updates on route params.
     this.route.params.pipe(
       // we need the 'id' param
@@ -36,5 +36,4 @@ export class UserDetailsComponent implements OnInit {
       switchMap(id => this.userService.usersAvailable)
     ).subscribe(available => this.user = this.userService.getUser(this.id));
   }
-
 }

@@ -30,7 +30,7 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    NgbModule,  
+    NgbModule,
     UserRoutingModule
   ],
   providers: [

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
   selector: 'app-header',
@@ -14,13 +15,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isLoggedIn$: Observable<boolean>;
   isAdmin$: Observable<boolean>;
   fullNameSubscription: Subscription;
-  fullName: string = '';
+  fullName = '';
 
   constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {
-  }
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     this.isLoggedIn$ = this.authService.userIsLoggedIn;
@@ -36,4 +35,3 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.fullNameSubscription.unsubscribe();
   }
 }
-

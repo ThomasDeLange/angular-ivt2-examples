@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 import { Observable, from } from 'rxjs'
 import { map, reduce } from 'rxjs/operators'
@@ -38,7 +38,7 @@ export class UserRoleNamePipe implements PipeTransform {
 export enum Gender {
 	'male' = 0,
 	'female',
-	'unknown' 
+	'unknown'
 }
 
 export enum Title {
@@ -99,6 +99,8 @@ export class User {
 	};
 	phone: string;
 	cell: string;
+	firstName: string
+	lastName: String
 	picture: {
 		large: string;
 		medium: string;
@@ -121,7 +123,7 @@ export class User {
 
 	/**
 	 * Checks whether this user has the given role. Used in authenticated routes.
-	 * 
+	 *
 	 * @param rolename UserRole
 	 */
 	public hasRole(rolename: UserRole): Observable<boolean> {

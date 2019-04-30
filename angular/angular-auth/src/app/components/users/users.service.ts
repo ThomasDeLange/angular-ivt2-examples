@@ -16,7 +16,7 @@ export class UserService {
 
   constructor(
     private http: HttpClient
-  ) { 
+  ) {
     console.log('UserService constructed');
     console.log(`Connected to ${environment.apiUrl}`);
   }
@@ -49,11 +49,10 @@ export class UserService {
         // error => console.log(error))
     );
   }
-
   getUser(id: number): User {
     console.log(`getUser(${id})`);
 
-    if(this.users && id >= 0 && id < this.users.length){
+    if (this.users && id >= 0 && id < this.users.length) {
       // id is valid and users are available
       // this returns a reference to the original array item!
       // https://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript
@@ -77,7 +76,7 @@ export class UserService {
 
   }
 
-  updateUser(user: User){
+  updateUser(user: User) {
     console.log('updateUser');
     // ToDo: needs implementation
     return this.http.put(`${environment.apiUrl}/api/persons/${user._id}`, user);
@@ -99,14 +98,14 @@ export class UserService {
     // return an observable with a user-facing error message
     return throwError(
       // 'Something bad happened; please try again later.'
-      error.message || error.error.message      
+      error.message || error.error.message
     );
   };
 
 }
 
 /**
- * This interface specifies the structure of the expected API server response. 
+ * This interface specifies the structure of the expected API server response.
  */
 export interface ApiResponse {
   results: any[];
